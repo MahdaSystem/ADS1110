@@ -41,6 +41,38 @@ extern "C" {
 #include "ADS1110.h"
 
 
+/* Functionality Options --------------------------------------------------------*/
+/**
+ * @brief  Specify the target platform
+ * @note   Uncomment the line below according to the target platform
+ */ 
+// #define ADS1110_PLATFORM_STM32_HAL
+// #define ADS1110_PLATFORM_ESP32_IDF
+// #define ADS1110_PLATFORM_AVR
+
+
+#if defined(ADS1110_PLATFORM_STM32_HAL)
+#define ADS1110_HI2C      hi2c2
+#elif defined(ADS1110_PLATFORM_ESP32_IDF)
+#define ADS1110_I2C_NUM   I2C_NUM_1
+#define ADS1110_I2C_RATE  100000
+#define ADS1110_SCL_GPIO  GPIO_NUM_13
+#define ADS1110_SDA_GPIO  GPIO_NUM_14
+#elif defined(ADS1110_PLATFORM_AVR)
+#define ADS1110_CPU_CLK   8000000UL
+#define ADS1110_I2C_RATE  100000
+#endif
+
+
+/**
+ ==================================================================================
+                             ##### Functions #####                                 
+ ==================================================================================
+ */
+
+void
+ADS1110_Platform_Init(ADS1110_Handler_t *Handler);
+
 
 #ifdef __cplusplus
 }
