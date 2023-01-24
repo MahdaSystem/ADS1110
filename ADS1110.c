@@ -67,7 +67,7 @@ ADS1110_ReadAll(ADS1110_Handler_t *Handler, uint8_t *Data)
 static int8_t
 ADS1110_ReadConfigurationRegister(ADS1110_Handler_t *Handler, uint8_t *Data)
 {
-  uint8_t Buffer = {0};
+  uint8_t Buffer[3] = {0};
   int8_t RetVal = 0;
 
   RetVal = ADS1110_ReadAll(Handler, Buffer);
