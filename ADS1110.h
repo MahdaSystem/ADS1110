@@ -155,7 +155,7 @@ typedef struct ADS1110_Handler_s
   ADS1110_Address_t AddressI2C;
   ADS1110_Mode_t Mode;
   ADS1110_Gain_t Gain;
-  ADS1110_Speed_t Speed;
+  ADS1110_Rate_t Rate;
 
   // Initializes platform dependent layer
   ADS1110_PlatformInitDeinit_t PlatformInit;

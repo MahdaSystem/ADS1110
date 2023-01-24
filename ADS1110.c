@@ -179,7 +179,7 @@ ADS1110_Init(ADS1110_Handler_t *Handler, ADS1110_Address_t Address)
 
   Handler->Mode = ADS1110_MODE_CONTINUOUS;
   Handler->Gain = ADS1110_GAIN_1;
-  Handler->Speed = ADS1110_SPEED_15MPS;
+  Handler->Rate = ADS1110_RATE_15MPS;
   
   return ADS1110_OK;
 }
