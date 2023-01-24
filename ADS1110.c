@@ -203,6 +203,29 @@ ADS1110_DeInit(ADS1110_Handler_t *Handler)
 }
 
 /**
+ * @brief  Send general call reset command
+ * @note   This command will send to address 0x00 and may adversely affect all
+ *         devices on the bus that support the general call address 0x00. Use this
+ *         function carefully.
+ * 
+ * @note   After calling this function, you must initialize the handler with
+ *         ADS1110_Init.
+ *         
+ * @param  Handler: Pointer to handler
+ * @retval ADS1110_Result_t
+ *         - ADS1110_OK: Operation was successful.
+ */
+ADS1110_Result_t
+ADS1110_GeneralCallReset(ADS1110_Handler_t *Handler)
+{
+  uint8_t CMD = 0x06;
+
+  Handler->PlatformSend(0x00, &CMD, 1);
+
+  return ADS1110_OK;
+}
+
+/**
  * @brief  Set measurement mode
  * @param  Handler: Pointer to handler
  * @param  Mode: Specify measurement mode
