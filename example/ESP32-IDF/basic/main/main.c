@@ -1,0 +1,69 @@
+/**
+ **********************************************************************************
+ * @file   main.c
+ * @author Hossein.M (https://github.com/Hossein-M98)
+ * @brief  example code for ADS1110 Driver (for ESP32-IDF)
+ **********************************************************************************
+ *
+ * Copyright (c) 2023 Mahda Embedded System (MIT License)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ *
+ **********************************************************************************
+ */
+
+#include <stdio.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "driver/gpio.h"
+#include "esp_log.h"
+#include "sdkconfig.h"
+
+#include "ADS1110.h"
+#include "ADS1110_platform.h"
+
+static const char *TAG = "example";
+
+void app_main(void)
+{
+  ADS1110_Handler_t Handler = {0};
+  ADS1110_Sample_t  Sample = {0};
+
+  ESP_LOGI(TAG, "ADS1110 Driver Example");
+
+  ADS1110_Platform_Init(&Handler);
+  ADS1110_Init(&Handler, ADS1110_ADDRESS_A0);
+  ADS1110_SetMode(&Handler, ADS1110_MODE_SINGLESHOT);
+  ADS1110_SetGain(&Handler, ADS1110_GAIN_1);
+  ADS1110_SetRate(&Handler, ADS1110_RATE_15MPS);
+
+  while (1)
+  {
+    ADS1110_StartConversion(&Handler);
+    while (ADS1110_CheckDataReady(&Handler) == ADS1110_DATA_NOT_READY)
+      vTaskDelay(1);
+
+    ADS1110_ReadSample(&Handler, &Sample);
+    ESP_LOGI(TAG, "Voltage: %fV", Sample.Voltage);
+
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
+
+  ADS1110_DeInit(&Handler);
+}
