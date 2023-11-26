@@ -1,6 +1,6 @@
 /**
  **********************************************************************************
- * @file   ADS1110_platform.h
+ * @file   ADS1110_platform.c
  * @author Hossein.M (https://github.com/Hossein-M98)
  * @brief  ADS1110 ADC driver platform dependent part
  **********************************************************************************
@@ -28,55 +28,82 @@
  **********************************************************************************
  */
 
-/* Define to prevent recursive inclusion ----------------------------------------*/
-#ifndef	_ADS1110_PLATFORM_H_
-#define _ADS1110_PLATFORM_H_
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 /* Includes ---------------------------------------------------------------------*/
-#include "ADS1110.h"
+#include "ADS1110_platform.h"
+#include "main.h"
 
 
-/* Functionality Options --------------------------------------------------------*/
-/**
- * @brief  Specify the target platform
- * @note   Uncomment the line below according to the target platform
- */ 
-// #define ADS1110_PLATFORM_STM32_HAL
-// #define ADS1110_PLATFORM_ESP32_IDF
-// #define ADS1110_PLATFORM_AVR
-
-
+/* Private Constants ------------------------------------------------------------*/
 #if defined(ADS1110_PLATFORM_STM32_HAL)
-#define ADS1110_HI2C      hi2c2
-#elif defined(ADS1110_PLATFORM_ESP32_IDF)
-#define ADS1110_I2C_NUM   I2C_NUM_1
-#define ADS1110_I2C_RATE  100000
-#define ADS1110_SCL_GPIO  GPIO_NUM_13
-#define ADS1110_SDA_GPIO  GPIO_NUM_14
-#elif defined(ADS1110_PLATFORM_AVR)
-#define ADS1110_CPU_CLK   8000000UL
-#define ADS1110_I2C_RATE  100000
+#define ADS1110_TIMEOUT 100
 #endif
 
 
 /**
  ==================================================================================
-                             ##### Functions #####                                 
+                           ##### Private Functions #####                           
  ==================================================================================
  */
 
-void
-ADS1110_Platform_Init(ADS1110_Handler_t *Handler);
-
-
-#ifdef __cplusplus
+static int8_t
+Platform_Init(void)
+{
+  return 0;
 }
-#endif
 
 
-#endif //! _ADS1110_PLATFORM_H_
+static int8_t
+Platform_DeInit(void)
+{
+  return 0;
+}
+
+
+static int8_t
+Platform_WriteData(uint8_t Address, uint8_t *Data, uint8_t DataLen)
+{
+  extern I2C_HandleTypeDef ADS1110_HI2C;
+
+  Address <<= 1;
+  if (HAL_I2C_Master_Transmit(&ADS1110_HI2C, Address,
+                              Data, DataLen, ADS1110_TIMEOUT))
+    return -1;
+
+  return 0;
+}
+
+
+static int8_t
+Platform_ReadData(uint8_t Address, uint8_t *Data, uint8_t DataLen)
+{
+  extern I2C_HandleTypeDef ADS1110_HI2C;
+
+  Address <<= 1;
+  if (HAL_I2C_Master_Receive(&ADS1110_HI2C, Address,
+                             Data, DataLen, ADS1110_TIMEOUT))
+    return -1;
+
+  return 0;
+}
+
+
+
+/**
+ ==================================================================================
+                            ##### Public Functions #####                           
+ ==================================================================================
+ */
+
+/**
+ * @brief  Initialize platform device to communicate ADS1110.
+ * @param  Handler: Pointer to handler
+ * @retval None
+ */
+void
+ADS1110_Platform_Init(ADS1110_Handler_t *Handler)
+{
+  Handler->PlatformInit = Platform_Init;
+  Handler->PlatformDeInit = Platform_DeInit;
+  Handler->PlatformSend = Platform_WriteData;
+  Handler->PlatformReceive = Platform_ReadData;
+}
